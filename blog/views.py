@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-# Create your views here.
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView  # 汎用クラスビュー
+from .models import Blog, Category  # 追加
 
 
 def index(request):  # 関数ベース
@@ -18,3 +19,14 @@ class IndexView(TemplateView):  # クラスベース
         context = self.get_context_data(**kwargs)
         print("IndexViewを使ってTOP画面を表示します！クラスベース")
         return self.render_to_response(context)
+
+
+class BlogListView(ListView):
+    template_name = 'blog/blog_list.html'
+    model = Blog
+    queryset = Blog.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(BlogListView, self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        return context
