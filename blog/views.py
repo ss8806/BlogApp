@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView  # 汎用クラスビュー
-from .models import Blog, Category  # 追加
+from .models import Blog, Category
+from . forms import BlogForm
+from django.urls import reverse_lazy
 
 
 def index(request):  # 関数ベース
@@ -30,3 +32,23 @@ class BlogListView(ListView):
         context = super(BlogListView, self).get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
         return context
+
+
+class BlogCreateView(CreateView):
+
+    model = Blog
+    form_class = BlogForm
+    # 登録処理が正常終了した場合の遷移先を指定
+    success_url = reverse_lazy('blog:create_done')
+
+    def get_context_data(self, **kwargs):
+
+        context = super(BlogCreateView, self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['message_type'] = "create"
+        return context
+
+
+def create_done(request):
+    # 登録処理が正常終了した場合に呼ばれる
+    return render(request, 'blog/create_done.html')
